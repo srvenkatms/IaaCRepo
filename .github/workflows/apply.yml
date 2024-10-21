@@ -6,12 +6,13 @@ on:
       approve:
         description: 'Approve the plan'
         required: true
-        default: 'true'
+        default: 'false'
 
 jobs:
   apply:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' && github.event.inputs.approve == 'true'
+    if: github.event.inputs.approve == 'true'
+    #if: github.event.workflow_run.conclusion == 'success' && github.event.inputs.approve == 'true'
 
     steps:
       - name: Checkout code
