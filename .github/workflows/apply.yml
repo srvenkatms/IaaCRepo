@@ -14,14 +14,29 @@ jobs:
 jobs:
   apply:
     runs-on: ubuntu-latest
-    if: github.event.inputs.approve == 'true'
-    #if: github.event.workflow_run.conclusion == 'success' && github.event.inputs.approve == 'true'
+    #if: github.event.inputs.approve == 'true'
+    if: github.event.workflow_run.conclusion == 'success' #&& github.event.inputs.approve == 'true'
 
     steps:
       - name: Wait for Approval
-          uses: peter-evans/repository-dispatch@v1
-          with:
-            event-type: manual-approval
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const { context, github } = require('@actions/github');
+            const runId = context.runId;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflowId = context.workflow;
+
+            await github.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: workflowId,
+              ref: context.ref,
+              inputs: {
+                approve: 'true'
+              }
+            });
       - name: Checkout code
         uses: actions/checkout@v2
 
