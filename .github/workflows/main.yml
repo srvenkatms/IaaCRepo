@@ -49,6 +49,7 @@ jobs:
 
       # Upload the plan file as an artifact
       - name: Upload Terraform Plan
+        if: github.event.inputs.approve == 'false'
         uses: actions/upload-artifact@v3
         with:
           name: tfplan
