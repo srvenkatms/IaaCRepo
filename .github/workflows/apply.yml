@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Wait for Approval
-        uses: peter-evans/wait-for-approval@v2
+        uses: peter-evans/manual-approval@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           approvers: ${{ github.actor }}
