@@ -11,28 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success'
 
-
-
     steps:
       - name: Wait for Approval
-        uses: actions/github-script@v4
+        uses: peter-evans/wait-for-approval@v2
         with:
-          script: |
-            const { context, github } = require('@actions/github');
-            const runId = context.runId;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const workflowId = context.workflow;
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          approvers: ${{ github.actor }}
+          label: 'manual approval required'
+          message: 'Please approve to proceed with the Terraform apply.'
 
-            await github.actions.createWorkflowDispatch({
-              owner,
-              repo,
-              workflow_id: workflowId,
-              ref: context.ref,
-              inputs: {
-                approve: 'true'
-              }
-            });
       - name: Checkout code
         uses: actions/checkout@v2
 
