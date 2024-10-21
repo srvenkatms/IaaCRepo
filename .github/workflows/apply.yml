@@ -1,12 +1,15 @@
 name: Terraform Apply
 
 on:
-  workflow_dispatch:
-    inputs:
-      approve:
-        description: 'Approve the plan'
-        required: true
-        default: 'false'
+  workflow_run:
+    workflows: ["Terraform Plan"]
+    types:
+      - completed
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
 
 jobs:
   apply:
@@ -15,6 +18,10 @@ jobs:
     #if: github.event.workflow_run.conclusion == 'success' && github.event.inputs.approve == 'true'
 
     steps:
+      - name: Wait for Approval
+          uses: peter-evans/repository-dispatch@v1
+          with:
+            event-type: manual-approval
       - name: Checkout code
         uses: actions/checkout@v2
 
