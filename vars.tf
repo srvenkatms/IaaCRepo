@@ -12,13 +12,12 @@ variable "container_name" {
 variable "name" {
   description = "The name of the Public IP."
   type        = string
-  
 }
 
 variable "location" {
   description = "The location/region where the Public IP is created."
   type        = string
-  default    = "East US"
+  default     = "East US"
 }
 
 variable "resource_group_name" {
