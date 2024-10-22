@@ -36,28 +36,7 @@ jobs:
         id: plan
         run: terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
 
-      - name: Detect Missing Resources
-        id: missing_resources
-        run: |
-          terraform show -json tfplan | jq -r '.resource_changes[] | select(.change.actions == ["create"]) | .type + "." + .name + " " + .change.after.id' > missing_resources.txt
-          
-          # Check if any missing resources were found
-          if [ -s missing_resources.txt ]; then
-            echo "resources_exist=true" >> $GITHUB_ENV
-          else
-            echo "resources_exist=false" >> $GITHUB_ENV
-          fi
-
-      - name: Import Missing Resources
-        if: env.resources_exist == 'true'
-        run: |
-          while IFS= read -r resource; do
-            terraform import "$resource" || echo "Failed to import $resource"
-          done < missing_resources.txt
-
-      - name: Terraform Plan (after import)
-        id: plan_after_import
-        run: terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
+     
 
   apply:
     runs-on: ubuntu-latest
