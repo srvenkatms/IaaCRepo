@@ -42,7 +42,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: tfplan
-          path: .
+          path: tfplan/tfplan
 
       - name: Terraform Init
         run: terraform init
