@@ -34,7 +34,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
+        run: terraform plan -out=tfplan -detailed-exitcode
 
       - name: Upload Terraform Plan
         if: success()
@@ -44,23 +44,24 @@ jobs:
           path: tfplan
 
       - name: Detect Missing Resources
-        id: missing_resources
+        id: detect_resources
         run: |
           terraform show -json tfplan | jq -r '.resource_changes[] | select(.change.actions == ["create"]) | .type + "." + .name + " " + .change.after.id' > missing_resources.txt
-
-      - name: Check for Missing Resources
-        id: resources_exist
-        run: |
-          if [[ -s missing_resources.txt ]]; then
+          if [ -s missing_resources.txt ]; then
             echo "resources_exist=true" >> $GITHUB_ENV
           else
             echo "resources_exist=false" >> $GITHUB_ENV
+          fi
 
       - name: Import Missing Resources
-        if: env.resources_exist == 'true'
+        if: success() && env.resources_exist == 'true'
         run: |
           while IFS= read -r resource; do
-            terraform import "$resource"
+            # Extract the resource type and name
+            type_name=$(echo "$resource" | cut -d ' ' -f 1)
+            resource_id=$(echo "$resource" | cut -d ' ' -f 2-)
+            echo "Importing resource: $type_name with ID: $resource_id"
+            terraform import "$type_name" "$resource_id"
           done < missing_resources.txt
 
   apply:
