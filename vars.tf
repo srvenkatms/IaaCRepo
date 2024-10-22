@@ -12,6 +12,7 @@ variable "container_name" {
 variable "name" {
   description = "The name of the Public IP."
   type        = string
+  default = "sv-my-public-ip"
 }
 
 variable "location" {
@@ -23,6 +24,7 @@ variable "location" {
 variable "resource_group_name" {
   description = "The name of the resource group in which to create the Public IP."
   type        = string
+  default     = "rgakskubent"
 }
 
 variable "allocation_method" {
@@ -34,7 +36,7 @@ variable "allocation_method" {
 variable "sku" {
   description = "The SKU of the Public IP. Possible values are Basic or Standard."
   type        = string
-  default     = "Basic"
+  default     = "STandard"
 }
 
 variable "tags" {

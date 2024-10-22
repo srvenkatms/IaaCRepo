@@ -1,6 +1,6 @@
 # Create a Resource Group if it doesn’t exist
 resource "azurerm_resource_group" "tfexample" {
-  name     = "rgakskubent"
+  name     = var.resource_group_name
   location = var.location
 }
 
