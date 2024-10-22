@@ -48,8 +48,16 @@ jobs:
         run: |
           terraform show -json tfplan | jq -r '.resource_changes[] | select(.change.actions == ["create"]) | .type + "." + .name + " " + .change.after.id' > missing_resources.txt
 
+      - name: Check for Missing Resources
+        id: resources_exist
+        run: |
+          if [[ -s missing_resources.txt ]]; then
+            echo "resources_exist=true" >> $GITHUB_ENV
+          else
+            echo "resources_exist=false" >> $GITHUB_ENV
+
       - name: Import Missing Resources
-        if: success() && (steps.missing_resources.outputs.resources_exist == 'true')
+        if: env.resources_exist == 'true'
         run: |
           while IFS= read -r resource; do
             terraform import "$resource"
@@ -59,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform
     environment:
-      name: production     # Replace with your GitHub Environment if needed
+      name: production  # Replace with your GitHub Environment if needed
 
     steps:
       - name: Checkout code
