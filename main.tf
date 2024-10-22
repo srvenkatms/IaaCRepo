@@ -26,11 +26,11 @@ resource "azurerm_storage_container" "terraform_state" {
 
 module "public_ip" {
   source              = "./terraform-modules/public-ip"
-  name                = "sv-my-public-ip"
+  name                = var.name
   location            = azurerm_resource_group.tfexample.location
   resource_group_name = azurerm_resource_group.tfexample.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
+  allocation_method   = var.allocation_method
+  sku                 = var.sku
   tags = {
     environment = "production"
   }
