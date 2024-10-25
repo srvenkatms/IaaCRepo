@@ -83,7 +83,10 @@ jobs:
         with:
           name: tfplan
           path: .
-
+      - name: Initialize Terraform
+        run: |
+          echo "Initializing Terraform..."
+          terraform init
       - name: Terraform Apply
         run: |
           echo "Applying Terraform plan..."
