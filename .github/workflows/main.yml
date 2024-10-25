@@ -41,7 +41,22 @@ jobs:
         run: |
           echo "Importing existing resource group..."
           terraform import azurerm_resource_group.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent
-          
+
+       - name: Import Existing Storage Account
+        run: |
+          echo "Importing existing storage account..."
+          terraform import azurerm_storage_account.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent/providers/Microsoft.Storage/storageAccounts/svtfstatestorage99
+
+      - name: Import Existing Storage Container
+        run: |
+          echo "Importing existing storage container..."
+          terraform import azurerm_storage_container.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent/providers/Microsoft.Storage/storageAccounts/svtfstatestorage99/blobServices/default/containers/tfstatestoragecont
+
+      - name: Assign Role to Service Principal
+        run: |
+          echo "Assigning role to service principal..."
+          az role assignment create --assignee 84f6f1be-759f-4225-b540-e87ee015ea2c --role "Contributor" --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent
+    
       - name: Terraform Plan
         id: plan
         run: |
