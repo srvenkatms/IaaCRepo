@@ -43,10 +43,7 @@ jobs:
           terraform init
 
       
-      - name: Import Existing Storage Account
-        run: |
-          echo "Importing existing storage account..."
-          terraform import azurerm_storage_account.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent/providers/Microsoft.Storage/storageAccounts/svtfstatestorage99
+      
 
       - name: Import Existing Storage Container
         run: |
