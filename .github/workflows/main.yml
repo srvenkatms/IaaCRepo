@@ -35,7 +35,7 @@ jobs:
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Initialize Terraform
-        run: terraform init -backend-config="path=backend-setup.tf"
+        run: terraform init
 
       - name: Apply Backend Setup
         run: terraform apply -auto-approve -var-file=backend-setup.tf
