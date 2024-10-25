@@ -46,7 +46,7 @@ jobs:
       - name: Assign Role to Service Principal
         run: |
           echo "Assigning role to service principal..."
-          az role assignment create --assignee 84f6f1be-759f-4225-b540-e87ee015ea2c --role "Contributor" --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent
+          az role assignment create --assignee 715f8e0e-34f6-4ce2-9c07-aa2a57a26923 --role "Contributor" --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent
 
       - name: Terraform Plan
         id: plan
