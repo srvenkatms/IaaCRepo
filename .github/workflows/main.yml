@@ -26,19 +26,26 @@ jobs:
 
       - name: Set up Terraform environment variables
         run: |
+          echo "Setting up Terraform environment variables..."
           echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
           echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
 
       - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          echo "Setting Azure subscription..."
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --debug
 
       - name: Initialize Terraform
-        run: terraform init
+        run: |
+          echo "Initializing Terraform..."
+          TF_LOG=DEBUG terraform init
 
       - name: Apply Backend Setup
-        run: terraform apply -auto-approve -var-file=backend-setup.tf
+        run: |
+          echo "Applying backend setup..."
+          terraform apply -auto-approve -var-file=backend-setup.tf
 
   plan:
     runs-on: ubuntu-latest
@@ -58,20 +65,27 @@ jobs:
 
       - name: Set up Terraform environment variables
         run: |
+          echo "Setting up Terraform environment variables..."
           echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
           echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
 
       - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          echo "Setting Azure subscription..."
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --debug
 
       - name: Initialize Terraform
-        run: terraform init
+        run: |
+          echo "Initializing Terraform..."
+          TF_LOG=DEBUG terraform init
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
+        run: |
+          echo "Running Terraform plan..."
+          terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v3
@@ -97,13 +111,16 @@ jobs:
 
       - name: Set up Terraform environment variables
         run: |
+          echo "Setting up Terraform environment variables..."
           echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
           echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
 
       - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          echo "Setting Azure subscription..."
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --debug
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v3
@@ -112,4 +129,6 @@ jobs:
           path: .
 
       - name: Terraform Apply
-        run: terraform apply -input=false tfplan
+        run: |
+          echo "Applying Terraform plan..."
+          terraform apply -input=false tfplan
