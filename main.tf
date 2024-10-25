@@ -1,9 +1,8 @@
-
-
 resource "azurerm_resource_group" "backend" {
   name     = "rgakskubent"
   location = "East US"
 }
+
 
 resource "azurerm_storage_account" "backend" {
   name                     = "svtfstatestorage99"
@@ -31,10 +30,10 @@ resource "azurerm_role_assignment" "storage_account_key_operator" {
 
 terraform {
   backend "azurerm" {
-    resource_group_name   = "rgakskubent"               # Static value
-    storage_account_name  = "svtfstatestorage99"        # Static value
-    container_name        = "tfstatestoragecont"        # Static value
-    key                   = "terraform.tfstate"
+    resource_group_name  = "rgakskubent"        # Static value
+    storage_account_name = "svtfstatestorage99" # Static value
+    container_name       = "tfstatestoragecont" # Static value
+    key                  = "terraform.tfstate"
   }
 }
 
