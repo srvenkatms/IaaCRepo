@@ -1,15 +1,3 @@
-# Input variable: Name of Storage Account
-variable "storage_account_name" {
-  description = "The name of the storage account. Must be globally unique, length between 3 and 24 characters and contain numbers and lowercase letters only."
-  default     = "svtfstatestorage99"
-}
-
-# Input variable: Name of Storage container
-variable "container_name" {
-  description = "The name of the Blob Storage container."
-  default     = "tfstatestoragecont"
-}
-
 # Input variable: Name of the Public IP
 variable "name" {
   description = "The name of the Public IP."
@@ -28,7 +16,7 @@ variable "location" {
 variable "resource_group_name" {
   description = "The name of the resource group in which to create the Public IP."
   type        = string
-  default     = "rgakskubent"
+  default     = "rgrgdeviaac"
 }
 
 # Input variable: Allocation Method
