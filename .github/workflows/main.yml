@@ -42,11 +42,7 @@ jobs:
           echo "Initializing Terraform..."
           terraform init
 
-      - name: Import Existing Resource Group
-        run: |
-          echo "Importing existing resource group..."
-          terraform import azurerm_resource_group.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent
-
+      
       - name: Import Existing Storage Account
         run: |
           echo "Importing existing storage account..."
