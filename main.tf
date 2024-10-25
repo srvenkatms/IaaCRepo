@@ -27,7 +27,7 @@ resource "azurerm_role_assignment" "storage_account_key_operator" {
   principal_id   = "84f6f1be-759f-4225-b540-e87ee015ea2c"
   role_definition_name = "Storage Account Key Operator Service Role"
   scope          = azurerm_storage_account.terraform_state.id
-}
+}az role assignment list --scope /subscriptions/20e88eb0-b38b-4513-a432-7b6f168c2a67/resourceGroups/rgakskubent/providers/Microsoft.Storage/storageAccounts/svtfstatestorage99 --assignee 84f6f1be-759f-4225-b540-e87ee015ea2c
 module "public_ip" {
   source              = "./terraform-modules/public-ip"
   name                = var.name
