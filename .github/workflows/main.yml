@@ -1,13 +1,15 @@
-name: Terraform Plan and Apply with Import
+name: Terraform Workflow
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  terraform:
+  backend-setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,20 +30,19 @@ jobs:
           echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+
       - name: Set Azure Subscription
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Terraform Init
-        run: terraform init
 
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
+      - name: Initialize Terraform
+        run: terraform init -backend-config="path=backend-setup.tf"
 
-     
+      - name: Apply Backend Setup
+        run: terraform apply -auto-approve -var-file=backend-setup.tf
 
-  apply:
+  plan:
     runs-on: ubuntu-latest
-    needs: terraform
+    needs: backend-setup
 
     steps:
       - name: Checkout code
@@ -55,14 +56,60 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Set up Terraform environment variables
+        run: |
+          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+
+      - name: Set Azure Subscription
+        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out=tfplan -detailed-exitcode || echo "Terraform plan failed."
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: tfplan
+
+  apply:
+    runs-on: ubuntu-latest
+    needs: plan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Terraform environment variables
+        run: |
+          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+
+      - name: Set Azure Subscription
+        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Download Terraform Plan
         uses: actions/download-artifact@v3
         with:
           name: tfplan
           path: .
-
-      - name: Terraform Init
-        run: terraform init
 
       - name: Terraform Apply
         run: terraform apply -input=false tfplan
