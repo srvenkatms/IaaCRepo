@@ -41,8 +41,8 @@ terraform {
 module "public_ip" {
   source              = "./terraform-modules/public-ip"
   name                = var.name
-  location            = azurerm_resource_group.tfexample.location
-  resource_group_name = azurerm_resource_group.tfexample.name
+  location            = azurerm_resource_group.backend.location
+  resource_group_name = azurerm_resource_group.backend.name
   allocation_method   = var.allocation_method
   sku                 = var.sku
   tags = {
