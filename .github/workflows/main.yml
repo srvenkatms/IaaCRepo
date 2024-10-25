@@ -51,7 +51,7 @@ jobs:
       - name: Import Existing Storage Container
         run: |
           echo "Importing existing storage container..."
-          terraform import azurerm_storage_container.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent/providers/Microsoft.Storage/storageAccounts/svtfstatestorage99/blobServices/default/containers/tfstatestoragecont
+          terraform import azurerm_storage_container.backend /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/rgakskubent/providers/Microsoft.Storage/storageAccounts/svtfstatestorage99/containers/tfstatestoragecont
 
       - name: Assign Role to Service Principal
         run: |
