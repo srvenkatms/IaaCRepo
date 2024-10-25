@@ -29,16 +29,14 @@ resource "azurerm_role_assignment" "storage_account_key_operator" {
   scope                = azurerm_storage_account.backend.id
 }
 
-# Configure the backend for storing the Terraform state in the storage account
 terraform {
   backend "azurerm" {
-    resource_group_name   = azurerm_resource_group.backend.name
-    storage_account_name  = azurerm_storage_account.backend.name
-    container_name        = azurerm_storage_container.backend.name
+    resource_group_name   = "rgakskubent"               # Static value
+    storage_account_name  = "svtfstatestorage99"        # Static value
+    container_name        = "tfstatestoragecont"        # Static value
     key                   = "terraform.tfstate"
   }
 }
-
 
 module "public_ip" {
   source              = "./terraform-modules/public-ip"
