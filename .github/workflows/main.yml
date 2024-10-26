@@ -1,7 +1,52 @@
 name: Terraform Workflow
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering from the GitHub Actions UI
+  pull_request:       # Automatically triggers on pull requests to the main branch
+    branches:
+      - main          # Specify the branch for pull request trigger
+
+jobs:
+  wiz_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install Wiz CLI
+        run: pip install wiz-cli
+
+      - name: Find and list .tf files
+        run: |
+          find . -type f -name "*.tf" > tf_files_list.txt
+
+      - name: Run Wiz scan
+        run: |
+          wiz scan --path $(cat tf_files_list.txt | tr '\n' ' ') --output wiz_scan_results.json
+
+      - name: Post results to PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RESULTS=$(cat wiz_scan_results.json)
+          COMMENT="### Wiz IaC Scan Results\n\`\`\`json\n$RESULTS\n\`\`\`"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" -X POST -d "{\"body\": \"$COMMENT\"}" "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+
+      - name: Check for critical issues
+        id: check_critical
+        run: |
+          CRITICAL_ISSUES=$(jq '.issues[] | select(.severity == "CRITICAL")' wiz_scan_results.json)
+          if [ -n "$CRITICAL_ISSUES" ]; then
+            echo "Critical issues found!"
+            exit 1
+          fi
+
 
 jobs:
   terraform:
