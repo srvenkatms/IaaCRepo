@@ -29,7 +29,7 @@ jobs:
 
       - name: Download WizCLI
         run: |
-        curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
+          curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
 
       - name: Authenticate to Wiz
         run: |
