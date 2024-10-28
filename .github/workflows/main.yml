@@ -7,7 +7,15 @@ on:
       - main          # Specify the branch for pull request trigger
 
 jobs:
-  wiz_scan:
+  wiz-iac-scan:
+    name: 'WizCLI IaC Scan'
+    env:
+      POLICY: 'Default IaC policy,secrets'
+      SCAN_PATH: '.'
+  
+    defaults:
+      run:
+        shell: bash
     runs-on: ubuntu-latest
 
     steps:
@@ -19,16 +27,22 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install Wiz CLI
-        run: pip install wiz-cli
+      - name: Download WizCLI
+      run: |
+        curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
 
-      - name: Find and list .tf files
+      - name: Authenticate to Wiz
         run: |
-          find . -type f -name "*.tf" > tf_files_list.txt
+          ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
+        env:
+          WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
+          WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
-      - name: Run Wiz scan
+      - name: Run WizCLI IaC Scan
         run: |
-          wiz scan --path $(cat tf_files_list.txt | tr '\n' ' ') --output wiz_scan_results.json
+          ./wizcli iac scan --path "${SCAN_PATH}" --policy "${POLICY}" --project "${PROJECT}" --output wiz_scan_results.json
+
+      
 
       - name: Post results to PR
         env:
